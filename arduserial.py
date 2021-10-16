@@ -4,7 +4,7 @@ import pandas as pd
 import serial
 import serial.tools.list_ports as serailpl
 
-ser = serial.Serial()
+ser = serial.Serial(timeout=0.1)
 data = []
 receiving = False
 puertos = [ports.device for ports in list(serailpl.comports())]
@@ -13,7 +13,7 @@ sg.theme('DarkAmber')   # Add a touch of color
 # All the stuff inside your window.
 layout = [  [sg.Text('Ingresar puerto COM'), sg.Combo(puertos)],
             [sg.Button('Ok'), sg.Button('Finish')],
-            [sg.Listbox(values=data, key='texto', size=(7,7))] 
+            [sg.Listbox(values=data, key='texto', size=(30,10), )] 
         ]
 
 # Create the Window
@@ -25,21 +25,26 @@ while True:
         break
     
     if event == 'Ok':
-        print(values)
-        ser.setPort(values[0])
-        ser.open()
-        receiving = True
+        if values[0]:
+            ser.setPort(values[0])
+            ser.open()
+            receiving = True
+        else:
+            sg.popup('Error: Puerto no seleccionado', title='Error' )
     elif event == 'Finish':
         ser.close()
         receiving = False
 
     if receiving:
-        reading = ser.read()
-        data.append(int(reading))
-        window.find_element('texto').Update(values=data)
-
+        try:
+            reading = ser.read()
+            data.append(int(reading))
+            window.find_element('texto').Update(values=data)
+        except:
+            pass
 
 datframe = pd.DataFrame(data)
-datframe.to_csv('./hola.csv', index=False)
+datframe.to_csv('./hola.csv', index=False, header=False)
+datframe.to
 ser.close()
 window.close()
