@@ -1,5 +1,4 @@
 import PySimpleGUI as sg
-import numpy as np
 import pandas as pd
 import serial
 import serial.tools.list_ports as serailpl
@@ -43,8 +42,11 @@ while True:
         except:
             pass
 
-datframe = pd.DataFrame(data)
-datframe.to_csv('./hola.csv', index=False, header=False)
-datframe.to
+try:
+    # Save data to csv
+    datframe = pd.DataFrame(data)   
+    datframe.to_csv('SerialData.csv', mode='a', header=False, index=False)
+except:
+    sg.popup('Error: No se pudo escribir los datos al archivo', title='Error' )
 ser.close()
 window.close()
